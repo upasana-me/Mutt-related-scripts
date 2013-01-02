@@ -1,0 +1,7 @@
+This script can be used for making contacts' groups in Mutt Email client.
+Requirement : Perl interpreter, I'm running it on version 5.14.2
+
+For executing the script, do the following in your terminal :
+$ ./vctomuttaliases.pl .mutt_aliases
+   
+In the above command line, .mutt_aliases is my mutt alias file.
