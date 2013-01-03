@@ -2,13 +2,12 @@
 
 use strict;
 use warnings;
-use Switch;
 
 sub appendToFile(\%$);
 
 our @alreadyPresent;
 
-print "$#ARGV\n";
+#print "$#ARGV\n";
 if( $#ARGV < 0 )
 {
     print "Usage : perl AddGroupsToMutt.pl <MuttAliasFile>\n";
@@ -33,54 +32,59 @@ else
     foreach( @matched )
     {
 	my $flag = 0;
-	if( /^(alias )(\".*\")( .*@.*)+/ )#(.*@.*( )*)+/ ) 
+	if( /^(?:alias )(["]?[\w+\s]+["]?)(?: .*@.*)+/ )
+	# if( /^(alias )(\".*\")( .*@.*)+/ )#(.*@.*( )*)+/ ) 
 	{
 	   $flag = 1; 
 	}
-	elsif( /^(alias )(\w+)( .*@.*)+/ )
-	{
-	    $flag = 1;
-	}
+	# elsif( /^(alias )(\w+)( .*@.*)+/ )
+	# {
+	#     $flag = 1;
+	# }
 
-	push @alreadyPresent, $2
+	push @alreadyPresent, $1
 	    if( $flag == 1 );
     }
 
     foreach( @matched )
     {
 	my ($flag, $repeatOuter, $repeatInner) = (0, 1, 1);
-	if( /^(alias )(\".*\")( .*@.*)+/ )#(.*@.*( )*)+/ ) 
+	if( /^(?:alias )(["]?[\w+\s]+["]?)( .*@.*)+/ )
+	# if( /^(alias )(\".*\")( .*@.*)+/ )#(.*@.*( )*)+/ ) 
 	{
-	   $flag = 1; 
+	    $flag = 1; 
 	}
-	elsif( /^(alias )(\w+)( .*@.*)+/ )
-	{
-	    $flag = 1;
-	}
+	# elsif( /^(alias )(\w+)( .*@.*)+/ )
+	# {
+	#     $flag = 1;
+	# }
 
-	if( ($flag == 1) && (defined $2) && (defined $3) )
+	if( ($flag == 1) && (defined $1) && (defined $2) )
 	{
+	    my $name = $1;
+	    my $emails = $2;
 	    while( $repeatOuter )
 	    {
 		$repeatInner = 1;
-		print "Name:\t$2\n";
-		print "Emails:\t$3\n";
+		print "Name:\t$name\n";
+		print "Emails:\t$emails\n";
 	       
 		my $choice = printGroupMenu(%groupsToEmails);
 		my @groups = sort keys %groupsToEmails;
-		if( isNum($choice) && ($choice >= 0) && ($choice < (scalar @groups)) )
+		if( isNum($choice) && ($choice >= 0) && ($choice <= $#groups))
 		{
-		    my $emails = $groupsToEmails{$groups[$choice]};
-		    $emails .= $3;
-		    $groupsToEmails{$groups[$choice]} = $emails;
+		    my $previousEmails = $groupsToEmails{$groups[$choice]};
+		    $previousEmails .= $emails;
+		    $groupsToEmails{$groups[$choice]} = $previousEmails;
 		    $repeatOuter = 0;
 		}
 		else
 		{
-		    switch($choice)
+		    for( $choice )
 		    {
-			case 'n' 
+			if(/^(n|N)$/)
 			{
+###			    print "'n' Pressed\n";
 			    while( $repeatInner )
 			    {
 				print "Enter the name of the new group or 'p' for returning to the previous menu: ";
@@ -91,26 +95,34 @@ else
 				    $repeatInner = 0;
 				}
 				elsif( exists $groupsToEmails{$newGroup} || 
-				       (grep /$newGroup/, @alreadyPresent) || 
-				       (grep /\"$newGroup\"/, @alreadyPresent))
+				       (grep /["]?$newGroup["]?/, @alreadyPresent) )#|| 
+#				       (grep /\"$newGroup\"/, @alreadyPresent))
 				{
 				    print "This group already exists, please choose a different name.\n";
 				}
 				else
 				{
-				    $groupsToEmails{$newGroup} = substr($3, 1);
+#				    print "$newGroup => $emails\n";
+				    $emails = substr($emails, 1)
+					if( $emails =~ /^\s/ );
+				    $groupsToEmails{$newGroup} = $emails;
 				    $repeatOuter = 0;
 				    $repeatInner = 0;
 				}
 			    }			    
 			}
-			case "q"
+			elsif(/^(q|Q)$/)
 			{
+			    # foreach( sort keys %groupsToEmails )
+			    # {
+			    # 	print "$_ => $groupsToEmails{$_}\n";
+			    # }
 			    appendToFile(%groupsToEmails, $fileName);
 			    exit;
 			}
-			case "s"
+			elsif(/^(s|S)$/)
 			{
+#			    print "'s' Pressed\n";
 			    $repeatOuter = 0;
 			    last;
 			}
@@ -149,9 +161,9 @@ sub printGroupMenu
     print "\tPress 's' for skipping this contact\n";
     print "\tPress 'q' for exiting.\n";
     print "\tSelect the group number from the following for adding this contact to an existing group.\n"
-	if( (scalar @groups) > 0 );
+	if( ($#groups) >= 0 );
     my $i = 0;
-    foreach( sort (keys %groupsToEmails) )
+    foreach( @groups )
     {
 	print "\t\t$i => $_\n";
 	$i++;
@@ -167,8 +179,9 @@ sub printGroupMenu
 sub isNum
 {
     $_ = shift;
+#    print "\$_ = $_\n";
     return 1
-	if( /(\d)+/ );
+	if( /^\d+$/ );
 
     return 0;
 }
