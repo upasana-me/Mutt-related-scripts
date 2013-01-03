@@ -32,7 +32,7 @@ else
     foreach( @matched )
     {
 	my $flag = 0;
-	if( /^(?:alias )(["]?[\w+\s]+["]?)(?: .*@.*)+/ )
+	if( /^(?:alias )(["]?[(\w|\.)+\s]+["]?)(?: .*@.*)+/ )
 	{
 	   $flag = 1; 
 	}
@@ -44,7 +44,7 @@ else
     foreach( @matched )
     {
 	my ($flag, $repeatOuter, $repeatInner) = (0, 1, 1);
-	if( /^(?:alias )(["]?[\w+\s]+["]?)( .*@.*)+/ )
+	if( /^(?:alias )(["]?[(\w|\.)+\s]+["]?)( .*@.*)+/ )
 	{
 	    $flag = 1; 
 	}
@@ -84,7 +84,7 @@ else
 				    $repeatInner = 0;
 				}
 				elsif( exists $groupsToEmails{$newGroup} || 
-				       (grep /["]?$newGroup["]?/, @alreadyPresent) ) 
+				       (grep /^["]?$newGroup["]?$/, @alreadyPresent) ) 
 				{
 				    print "This group already exists, please choose a different name.\n";
 				}
