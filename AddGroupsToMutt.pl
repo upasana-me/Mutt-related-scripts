@@ -33,14 +33,9 @@ else
     {
 	my $flag = 0;
 	if( /^(?:alias )(["]?[\w+\s]+["]?)(?: .*@.*)+/ )
-	# if( /^(alias )(\".*\")( .*@.*)+/ )#(.*@.*( )*)+/ ) 
 	{
 	   $flag = 1; 
 	}
-	# elsif( /^(alias )(\w+)( .*@.*)+/ )
-	# {
-	#     $flag = 1;
-	# }
 
 	push @alreadyPresent, $1
 	    if( $flag == 1 );
@@ -50,14 +45,9 @@ else
     {
 	my ($flag, $repeatOuter, $repeatInner) = (0, 1, 1);
 	if( /^(?:alias )(["]?[\w+\s]+["]?)( .*@.*)+/ )
-	# if( /^(alias )(\".*\")( .*@.*)+/ )#(.*@.*( )*)+/ ) 
 	{
 	    $flag = 1; 
 	}
-	# elsif( /^(alias )(\w+)( .*@.*)+/ )
-	# {
-	#     $flag = 1;
-	# }
 
 	if( ($flag == 1) && (defined $1) && (defined $2) )
 	{
@@ -84,7 +74,6 @@ else
 		    {
 			if(/^(n|N)$/)
 			{
-###			    print "'n' Pressed\n";
 			    while( $repeatInner )
 			    {
 				print "Enter the name of the new group or 'p' for returning to the previous menu: ";
@@ -95,14 +84,12 @@ else
 				    $repeatInner = 0;
 				}
 				elsif( exists $groupsToEmails{$newGroup} || 
-				       (grep /["]?$newGroup["]?/, @alreadyPresent) )#|| 
-#				       (grep /\"$newGroup\"/, @alreadyPresent))
+				       (grep /["]?$newGroup["]?/, @alreadyPresent) ) 
 				{
 				    print "This group already exists, please choose a different name.\n";
 				}
 				else
 				{
-#				    print "$newGroup => $emails\n";
 				    $emails = substr($emails, 1)
 					if( $emails =~ /^\s/ );
 				    $groupsToEmails{$newGroup} = $emails;
@@ -113,16 +100,11 @@ else
 			}
 			elsif(/^(q|Q)$/)
 			{
-			    # foreach( sort keys %groupsToEmails )
-			    # {
-			    # 	print "$_ => $groupsToEmails{$_}\n";
-			    # }
 			    appendToFile(%groupsToEmails, $fileName);
 			    exit;
 			}
 			elsif(/^(s|S)$/)
 			{
-#			    print "'s' Pressed\n";
 			    $repeatOuter = 0;
 			    last;
 			}
@@ -179,7 +161,6 @@ sub printGroupMenu
 sub isNum
 {
     $_ = shift;
-#    print "\$_ = $_\n";
     return 1
 	if( /^\d+$/ );
 
