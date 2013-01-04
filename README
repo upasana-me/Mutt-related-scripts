@@ -1,3 +1,5 @@
+AddGroupsToMutt.pl
+
 This script can be used for making contacts' groups in Mutt Email client.
 Requirement : Perl interpreter, I'm running it on version 5.14.2
 
@@ -5,3 +7,19 @@ For executing the script, do the following in your terminal :
 $ ./vctomuttaliases.pl .mutt_aliases
    
 In the above command line, .mutt_aliases is my mutt alias file.
+
+
+VcToMuttAliases.pl
+
+This script converts contacts from vCard format to Mutt aliases. It can be used for importing your gmail contacts to mutt email client.
+
+Requirement : Perl interpreter, I'm running it on version 5.14.2
+
+For executing the script, do the following in your terminal :
+$ perl VcToMuttAliases.pl contacts.vcf .mutt_aliases
+   
+In the above command, contacts.vcf is the file in which my contacts are stored in vCard format & .mutt_aliases is my mutt alias file.
+
+NOTE: 
+1. On command line, this perl script expects a file with .vcf extension, having Unix line-endings as its first argument.
+
